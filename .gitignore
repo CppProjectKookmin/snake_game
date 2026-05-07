@@ -1,0 +1,20 @@
+# Visual Studio 임시/세팅 파일들
+.vs/
+*.user
+*.suo
+*.db
+*.opendb
+
+# 빌드 결과물 (절대 깃허브에 올리면 안 되는 것들)
+x64/
+x86/
+Debug/
+Release/
+*.exe
+*.obj
+*.pdb
+*.idb
+*.ilk
+
+# 로그 파일
+*.log
