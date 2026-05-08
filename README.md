@@ -68,7 +68,7 @@ git commit -m "[type]: [message]"
 
 **작업 중인 브랜치 이름으로 Push**
 ```bash
-git push origin feature/[기능명]
+git push --set-upstream origin feature/[기능명]
 ```
 
 ### 5. Pull Request (PR) 생성 및 병합
