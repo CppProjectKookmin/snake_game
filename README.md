@@ -95,7 +95,7 @@ git push --set-upstream origin feature/[기능명]
 ### 5. Pull Request (PR) 생성 및 병합
 GitHub 웹 페이지에서 본인의 브랜치를 `main`으로 합치는 **Pull Request**를 생성합니다.
 1. GitHub 레포지토리 접속 후 **Compare & pull request** 클릭
-2. 구현 내용 요약 작성 후 **Create pull request** 클릭
+2. 구현 내용 요약 작성, 이슈 연결 후 **Create pull request** 클릭
 3. 팀장의 코드 리뷰 및 승인 후 병합(Merge) 진행
 
 ### 6. 로컬 환경 정리
