@@ -19,7 +19,14 @@
 >       ├── CppProject.vcxproj
 >       └── CppProject.vcxproj.filters
 > ```
->
+
+
+
+
+<br>
+#코딩할 때, 꼭 주요기능엔 주석달면서 해주면 좋습니다! (*결국 교수님께 제출해야하기에!)
+<br>
+
 ## 🛠 Git 협업 지침 (Workflow)
 
 > [!CAUTION]
