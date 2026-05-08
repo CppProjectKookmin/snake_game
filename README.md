@@ -109,5 +109,41 @@ git branch -d feature/[기능명]
 ```
 
 
+맥/리눅스 환경 터미널 실행 가이드
+윈도우(Visual Studio) 환경이 아닌 맥 또는 리눅스 사용자는 아래 절차에 따라 터미널에서 직접 컴파일하여 실행할 수 있습니다.
+
+1. 필수 라이브러리 설치
+대부분의 맥/리눅스 환경에는 ncurses가 기본 설치되어 있으나, 없을 경우 아래 명령어로 설치합니다.
+
+Mac (Homebrew): brew install ncurses
+
+Linux (Ubuntu): sudo apt-get install libncurses5-dev libncursesw5-dev
+
+2. 소스 코드 수정 (중요)
+윈도우 전용 헤더(curses.h)와 맥/리눅스 표준 헤더(ncurses.h)가 다르므로, 코드 최상단에 아래 코드를 추가하여 호환성을 확보해야 합니다.
+
+C++
+#if defined(_WIN32)
+    #include "curses.h"   // Windows (PDCurses)
+#else
+    #include <ncurses.h> // Mac/Linux (ncurses)
+#endif
+3. 컴파일 및 실행
+터미널을 열고 프로젝트 폴더로 이동한 뒤 아래 명령어를 입력합니다.
+
+컴파일 (Compile)
+
+Bash
+# 모든 .cpp 파일을 묶어서 snake_game이라는 실행 파일로 만듭니다.
+g++ *.cpp -lncurses -o snake_game
+실행 (Run)
+
+Bash
+./snake_game
+⚠️ 주의 사항
+PDCurses 파일 제외: 컴파일 시 윈도우용 라이브러리 파일인 pdcurses.lib나 curses.h 파일이 같은 폴더에 있어도 -lncurses 옵션이 시스템 라이브러리를 우선 참조하므로 무시해도 괜찮습니다.
+
+화면 깨짐: 실행 후 화면이 깨진다면 터미널 창의 크기를 충분히 키우고 다시 실행해 보세요.
+
 
 
