@@ -1,4 +1,5 @@
 #include <iostream>
+#include <deque>
 
 extern "C" {
 #include "curses.h"
@@ -9,6 +10,12 @@ extern "C" {
 using namespace std;
 
 const int MAP_SIZE = 21;
+
+enum Direction { UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3 };
+
+struct Pos {
+    int y, x;
+};
 
 // Stage 1: Basic Border
 int stage1[MAP_SIZE][MAP_SIZE] = {
@@ -135,6 +142,15 @@ int stage5[MAP_SIZE][MAP_SIZE] = {
     {2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2}
 };
 
+// 뱀 초기 세팅
+std::deque<Pos> snake;
+int current_dir = LEFT;
+int current_length = 3;
+int max_length = 3;
+
+int dy[4] = { -1, 0, 1, 0 };
+int dx[4] = { 0, 1, 0, -1 };
+
 void DrawMap(int (*stage)[MAP_SIZE]) {
     for (int y = 0; y < MAP_SIZE; y++) {
         for (int x = 0; x < MAP_SIZE; x++) {
@@ -157,33 +173,91 @@ int main() {
     curs_set(0);
     keypad(stdscr, TRUE);
 
+    timeout(500); // Tick 설정(500ms)
+
     int currentStage = 1;
     bool running = true;
 
+    // 뱀 초기 좌표
+	snake.push_back({ MAP_SIZE / 2, MAP_SIZE / 2 });
+	snake.push_back({ MAP_SIZE / 2, MAP_SIZE / 2 + 1 });
+	snake.push_back({ MAP_SIZE / 2, MAP_SIZE / 2 + 2 });
+
     while (running) {
-        clear();
-        int (*targetStage)[MAP_SIZE];
+        int (*targetStage)[MAP_SIZE] = stage1;
 
-        switch (currentStage) {
-            case 1: targetStage = stage1; break;
-            case 2: targetStage = stage2; break;
-            case 3: targetStage = stage3; break;
-            case 4: targetStage = stage4; break;
-            case 5: targetStage = stage5; break;
-            default: targetStage = stage1; break;
-        }
-
-        DrawMap(targetStage);
-        mvprintw(MAP_SIZE + 1, 0, "Stage: %d", currentStage);
-        mvprintw(MAP_SIZE + 2, 0, "Press 1-5 to change stage, 'q' to quit.");
-        refresh();
-
+        // 키 입력 처리
         int ch = getch();
         if (ch == 'q' || ch == 'Q') {
             running = false;
-        } else if (ch >= '1' && ch <= '5') {
-            currentStage = ch - '0';
         }
+        else if (ch == KEY_UP) {
+            if (current_dir == DOWN) running = false;
+            else current_dir = UP;
+        }
+        else if (ch == KEY_DOWN) {
+            if (current_dir == UP) running = false;
+            else current_dir = DOWN;
+        }
+        else if (ch == KEY_LEFT) {
+            if (current_dir == RIGHT) running = false;
+            else current_dir = LEFT;
+        }
+        else if (ch == KEY_RIGHT) {
+            if (current_dir == LEFT) running = false;
+            else current_dir = RIGHT;
+        }
+
+        if (!running) break;
+
+        // 다음 머리 위치
+        Pos head = snake.front();
+        int ny = head.y + dy[current_dir];
+        int nx = head.x + dx[current_dir];
+
+        // 벽 충돌 판정
+        if (targetStage[ny][nx] == 1 || targetStage[ny][nx] == 2) {
+            // 벽에 부딪히면 게임 종료
+            running = false;
+            break;
+        }
+
+        // 몸통 충돌 판정
+        bool hitBody = false;
+        for (const auto& bodyPart : snake) {
+            if (bodyPart.y == ny && bodyPart.x == nx) {
+                hitBody = true;
+                break;
+            }
+        }
+        if (hitBody) {
+            // 몸통에 부딪히면 게임 종료
+            running = false;
+            break;
+        }
+
+        // 뱀 이동
+        snake.push_front({ ny, nx }); // 머리 추가
+        snake.pop_back(); // 꼬리 제거
+
+        // 화면 그리기
+        clear();
+        DrawMap(targetStage); // 빈 맵 그리기
+
+        // 뱀 그리기
+        for (size_t i = 0; i < snake.size(); i++) {
+            if (i == 0) {
+                mvprintw(snake[i].y, snake[i].x, "O"); // 머리
+            }
+            else {
+                mvprintw(snake[i].y, snake[i].x, "o"); // 몸통
+            }
+        }
+
+        // 상태창 update
+        mvprintw(MAP_SIZE + 1, 0, "Current Length: %d / Max Length: %d", current_length, max_length);
+
+        refresh();
     }
 
     endwin();
