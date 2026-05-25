@@ -1,0 +1,38 @@
+/*
+ * File: Snake.h
+ * Description: Snake 클래스의 선언부. 뱀의 상태(좌표, 방향, 길이) 관리 및 이동 알고리즘 담당
+ * Author: 박서린
+ */
+
+#ifndef SNAKE_H
+#define SNAKE_H
+
+#include <deque>
+
+enum Direction { UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3 };
+
+struct Pos {
+    int y, x;
+};
+
+class Snake {
+private:
+    std::deque<Pos> body;
+    Direction current_dir;
+    int current_length;
+    int max_length;
+
+public:
+    Snake();
+
+    bool changeDirection(const int ch);
+    void move(const Pos nextP, const bool grow);
+
+    Pos getNextHead() const;
+    bool checkBodyCollision(const Pos p) const;
+    const std::deque<Pos>& getBody() const;
+    int getLength() const;
+    int getMaxLength() const;
+};
+
+#endif
