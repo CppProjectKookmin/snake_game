@@ -27,6 +27,7 @@ public:
 
     bool changeDirection(const int ch);
     void move(const Pos nextP, const bool grow);
+    void shrink() { body.pop_back(); current_length--; } // [Stage 3] 독 아이템 획득 시 꼬리 강제 제거 함수
 
     Pos getNextHead() const;
     bool checkBodyCollision(const Pos p) const;

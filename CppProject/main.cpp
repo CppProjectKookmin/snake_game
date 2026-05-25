@@ -79,6 +79,9 @@ int main() {
                 // Poison Item 획득 시: 기본 이동 처리 후 축소 메커니즘 수행
                 snake.move(nextP, false); 
                 
+                // [수정] 이동 후 꼬리를 한 칸 더 잘라내어 실질적인 길이 축소 적용
+                snake.shrink(); 
+                
                 // 프로젝트 기능 명세 제약 조건 검사:
                 // Poison 아이템 누적으로 인해 뱀의 총 길이가 최소 기준(3 미만) 하회 시 게임 오버 처리
                 if (snake.getLength() < 3) {
