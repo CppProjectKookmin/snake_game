@@ -182,3 +182,7 @@ bool Board::checkWallCollision(const Pos p) const {
     if (stageData[p.y][p.x] == 1 || stageData[p.y][p.x] == 2) return true;
     return false;
 }
+
+int Board::getData(const int y, const int x) const {
+    return stageData[y][x];
+}

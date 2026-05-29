@@ -1,7 +1,10 @@
 <Solution>
   <Configurations>
+    <Platform Name="Win32" />
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="CppProject/CppProject.vcxproj" Id="9f63cf51-5195-4557-981d-838ffccc01d5" />
+  <Project Path="CppProject/CppProject.vcxproj" Id="9f63cf51-5195-4557-981d-838ffccc01d5">
+    <Platform Solution="Debug|x64" Project="Win32" />
+  </Project>
 </Solution>

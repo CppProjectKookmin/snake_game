@@ -3,13 +3,14 @@
  * Description: 시스템 진입점 및 메인 컨트롤 루프. 
  * ncurses 라이브러리 환경 초기화, 실시간 게임 루프 제어 및 
  * Board, Snake, ItemManager 객체 간의 상호작용 조율을 담당함.
- * Author: 박서린 (Stage 3 Item 시스템 추가 구현: 박하은)
+ * Author: 박서린 (Stage 3 Item 시스템 추가 구현: 박하은 / Stage 4 gate 시스템 추가 구현: 조성래 )
  */
 
 #include <iostream>
 #include "Board.h"
 #include "Snake.h"
 #include "ItemManager.h" // [Stage 3] 객체지향 설계를 위한 아이템 제어 컴포넌트 추가
+#include "Gate.h"
 
 extern "C" {
 #include "curses.h"
@@ -33,6 +34,12 @@ int main() {
     Board board;
     Snake snake;
     ItemManager itemMgr; // 인스턴스 캡슐화를 통한 독립적 아이템 상태 관리
+    Gate gate; // Gate 시스템 초기화
+    
+    // 게임 시작 시 Board 데이터를 읽어 Gate 쌍 1회 생성 (한 번 생성된 Gate는 사라지지 않음)
+    gate.generateGates(board); 
+    
+    
     bool running = true;
 
     // =====================================================================
@@ -59,9 +66,24 @@ int main() {
 
         // 차기 프레임의 헤드(Head) 예정 좌표 산출
         Pos nextP = snake.getNextHead();
+        bool isTeleporting = false; // 텔레포트 상태 확인용 플래그
+
+        // [Stage 4] Gate 진출입 및 텔레포트 검사 로직
+        if (gate.isGate(nextP)) {
+            Pos exitGate = gate.getOtherGate(nextP); 
+            Direction newDir = gate.getExitDirection(board, exitGate, snake.getDirection()); 
+            
+            snake.setDirection(newDir); // 나갈 방향으로 머리 방향 강제 전환
+            nextP = exitGate;           // 충돌을 무시하고 머리 좌표를 출구로 텔레포트 처리
+            isTeleporting = true;       // 방금 텔레포트 했음을 표시
+        }
+
+
 
         // 환경 요소(벽) 및 물리적 내부 충돌(몸통)에 대한 충돌 검사 수행
-        if (board.checkWallCollision(nextP) || snake.checkBodyCollision(nextP)) {
+        // 방금 게이트를 타고 출구로 나온 상태(isTeleporting == true)라면, 
+        // 출구 자체가 원래 '벽'이므로 이번 턴에서는 벽 충돌 검사를 무시합니다!
+        if ((!isTeleporting && board.checkWallCollision(nextP)) || snake.checkBodyCollision(nextP)) {
             running = false;
             break;
         }
@@ -102,6 +124,14 @@ int main() {
 
         // [Stage 3] 보드 레이어 상단에 상호작용 아이템(G/P) 오브젝트 최종 오버레이 출력
         itemMgr.renderItems();
+
+        // [Stage 4] 생성된 Gate 객체를 화면에 출력
+        if (gate.isActive()) {
+            // A, B라는 임의의 기호로 맵 위에 Gate를 그립니다 (기호는 원하시는 문자로 변경 가능)
+            mvprintw(gate.getGateA().y, gate.getGateA().x, "A");
+            mvprintw(gate.getGateB().y, gate.getGateB().x, "B");
+        }
+
         
         refresh();
     }

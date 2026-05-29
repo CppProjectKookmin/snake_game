@@ -74,3 +74,6 @@ bool Snake::checkBodyCollision(const Pos p) const {
 const std::deque<Pos>& Snake::getBody() const { return body; }
 int Snake::getLength() const { return current_length; }
 int Snake::getMaxLength() const { return max_length; }
+
+Direction Snake::getDirection() const { return current_dir; }
+void Snake::setDirection(const Direction dir) { current_dir = dir; }
