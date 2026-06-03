@@ -34,6 +34,8 @@ public:
     const std::deque<Pos>& getBody() const;
     int getLength() const;
     int getMaxLength() const;
+    Direction getDirection() const;           // 현재 방향 반환
+    void setDirection(const Direction dir);   // 게이트 통과 후 방향 수정
 };
 
 #endif

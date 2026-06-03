@@ -18,6 +18,8 @@ private:
 
 public:
     Board();
+// 맵 데이터를 외부에서 안전하게 읽기 위한 Getter
+    int getData(const int y, const int x) const;
 
     void loadStage(const int stageIndex);
     void draw(const std::deque<Pos>& snakeBody, const int current_len, const int max_len) const;
