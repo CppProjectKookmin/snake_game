@@ -11,14 +11,15 @@ extern "C" {
 }
 
 Snake::Snake() {
-    current_dir = LEFT;
+    // [수정] 모든 스테이지에서 장애물과 충돌하지 않는 안전 구역(Row 1)으로 스폰 위치 및 방향 변경
+    current_dir = RIGHT; 
     current_length = 3;
     max_length = 3;
 
-    // 뱀 초기 좌표
-    body.push_back({ 10, 10 });
-    body.push_back({ 10, 11 });
-    body.push_back({ 10, 12 });
+    // 안전한 우측 상단 라인에 뱀 배치 (머리가 3, 몸통이 2, 꼬리가 1)
+    body.push_back({ 1, 3 });
+    body.push_back({ 1, 2 });
+    body.push_back({ 1, 1 });
 }
 
 // 방향 전환 로직: 반대 방향 입력 시 false 반환하여 실패 처리 유도
