@@ -2,7 +2,7 @@
  * File: main.cpp
  * Description: 시스템 진입점 및 메인 컨트롤 루프.
  * ncurses 라이브러리 환경 초기화, 실시간 게임 루프 제어 및
- * Board, Snake, ItemManager 객체 간의 상호작용 조율을 담당함.
+ * Board, Snake, ItemManager, Gate, ScoreManager 객체 간의 상호작용 조율을 담당함.
  * Author: 박서린 (Stage 3 Item 시스템 추가 구현: 박하은 / Stage 4 gate 시스템 추가 구현: 조성래 / Stage 5 최종 완성: 김현수)
  */
 
@@ -32,7 +32,7 @@ int main() {
     int currentStage = 1;
     bool gameRunning = true;
 
-    ScoreManager scoreMgr; // [Stage 5] 역사(History) 보존을 위해 대형 루프 바깥으로 격상
+    ScoreManager scoreMgr; // [Stage 5] 역사(History) 보존 및 연속 적산을 위해 대형 루프 바깥으로 격상
 
     // 전체 5개 스테이지 진행을 위한 대형 루프 구조 설계
     while (currentStage <= 5 && gameRunning) {
@@ -69,17 +69,17 @@ int main() {
                 break;
             }
 
-            // [디버그/기능추가] 스테이지 재시작 치트키 (R)
+            // [Stage 5 추가] QA 테스트 및 예외 상황 유연 대처용 스테이지 재시작 단축키 (R)
             if (ch == 'r' || ch == 'R') {
-                stageRunning = false; // 현재 루프만 폭파하고 바깥 루프에서 동일 스테이지로 재진입
+                stageRunning = false; // 현재 내부 스테이지 프레임만 폭파하고 바깥 루프에서 동일 스테이지 재진입
                 break;
             }
 
-            // [디버그/기능추가] 스테이지 스킵 치트키 (N)
+            // [Stage 5 추가] 교수님 최종 시연 및 빠른 모듈 검증용 스테이지 스킵 단축키 (N)
             if (ch == 'n' || ch == 'N') {
-                scoreMgr.saveStageRecord(); // 현재까지 기록 저장
+                scoreMgr.saveStageRecord(); // 현재까지 진행 기록 백업
                 stageRunning = false;
-                currentStage++; // 스테이지 강제 점증 후 다음 루프로 패스
+                currentStage++; // 스테이지 강제 워프 연산
                 break;
             }
 
@@ -147,7 +147,7 @@ int main() {
                 snake.move(nextP, false);
             }
 
-            // [Stage 5] 매 틱마다 실시간 뱀 길이 및 시간 스코어 갱신
+            // [Stage 5] 매 틱마다 실시간 뱀 길이 및 시간 스코어 데이터 적산
             scoreMgr.updateLength(snake.getLength(), snake.getMaxLength());
             scoreMgr.updateTime(); // 매 프레임 경과 시간 계산 연산 유도
 
@@ -155,11 +155,11 @@ int main() {
             if (scoreMgr.checkMissionComplete()) {
                 scoreMgr.saveStageRecord(); // 스테이지 통과 시 현 시점 데이터 백업 아카이빙
 
-                // [Stage 5 추가] 대기 모드로 전환하여 유저가 클리어 메시지를 읽을 수 있도록 함
+                // [UX 고도화 인터페이스] 대기 모드로 전환하여 유저가 클리어 메시지를 인지할 수 있도록 함
                 timeout(-1);
                 scoreMgr.renderStageClearScreen();
-                getch(); // 유저의 키 입력 대기
-                timeout(500); // 다음 스테이지를 위해 타이머 500ms로 원복
+                getch(); // 유저의 입력 대기 제어
+                timeout(500); // 다음 스테이지 연산을 위해 지연 클럭 타이머 500ms로 원복
 
                 stageRunning = false;       // 미션 완료 시 현재 스테이지 내부 루프 탈출
                 currentStage++;             // 차기 스테이지 인덱스 점증
@@ -189,9 +189,9 @@ int main() {
         }
     }
 
-    // [Stage 5] 게임 종료 시(클리어 혹은 오버) 최종 전적 스크린 출력 샌드박스 가동
-    timeout(-1); // 결과를 팀장님이 볼 수 있도록 대기 시간 무한대 전환
-    scoreMgr.saveStageRecord(); // 마지막 플레이 중이던 스테이지 기록 임시 저장
+    // [Stage 5] 게임 완전 종료 시(전체 클리어 혹은 오버) 최종 데이터 정산 통계 스크린 샌드박스 가동
+    timeout(-1); // 결과를 팀장님이 확인할 수 있도록 ncurses 입력 대기 시간 무한대 전환
+    scoreMgr.saveStageRecord(); // 마지막 플레이 중이던 최종 스테이지 레코드 마킹
     scoreMgr.renderFinalSummary();
     getch();
 
