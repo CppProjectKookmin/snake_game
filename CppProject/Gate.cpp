@@ -14,7 +14,7 @@ Gate::Gate() {
     gateB = { -1, -1 };
     bIsActive = false;
 }
-
+    
 void Gate::generateGates(const Board& board) {
     std::vector<Pos> wallList;
 

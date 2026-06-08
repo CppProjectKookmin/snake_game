@@ -45,7 +45,9 @@ void ItemManager::spawnItem(const Board& board, const std::deque<Pos>& snakeBody
     while (attempts < MAX_ATTEMPTS) {
         int rx = rand() % MAP_SIZE;
         int ry = rand() % MAP_SIZE;
-        Pos p = { rx, ry };
+
+        // [수정] Pos 구조체의 순서 명세 { y, x } 에 맞춰 올바르게 좌표 바인딩 (김현수 디버깅)
+        Pos p = { ry, rx };
 
         // 검증 조건 1: 정적 환경 요소(고정 벽 # 및 크래시 경계 X)와의 중첩 여부 판단
         if (board.checkWallCollision(p)) {
