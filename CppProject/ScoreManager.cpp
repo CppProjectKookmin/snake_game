@@ -14,7 +14,18 @@ extern "C" {
 }
 
 ScoreManager::ScoreManager() {
+
     currentStage = 1;
+    currentLength = 0;
+    maxLength = 0;
+    growthCount = 0;
+    poisonCount = 0;
+    gateCount = 0;
+    currentCombo = 0;
+    maxCombo = 0;
+    elapsedSeconds = 0;
+    stageStartTime = 0;
+
 
     // [프로젝트 명세 준수] 각 스테이지별 동적 난이도 조절을 위한 미션 기준 데이터 테이블 바인딩
     stageMissions[0] = { 5, 2, 1, 1 }; // Stage 1
@@ -108,6 +119,13 @@ void ScoreManager::renderScoreBoard() const {
     mvprintw(17, startX, "-: %d (%d)  [%c]", poisonCount, m.targetPoison, (poisonCount >= m.targetPoison) ? 'V' : 'X');
     mvprintw(18, startX, "G: %d (%d)  [%c]", gateCount, m.targetGate, (gateCount >= m.targetGate) ? 'V' : 'X');
     mvprintw(19, startX, "======================");
+
+    if (currentCombo >= 3) {
+        mvprintw(21, startX, "🔥 FEVER TIME ACTIVE! 🔥");
+    }
+    else {
+        mvprintw(21, startX, "                        "); // 잔상 제거
+    }
 }
 
 void ScoreManager::saveStageRecord() {

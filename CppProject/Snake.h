@@ -23,7 +23,7 @@ private:
     int max_length;
 
 public:
-    Snake();
+    Snake(int stage);
 
     bool changeDirection(const int ch);
     void move(const Pos nextP, const bool grow);

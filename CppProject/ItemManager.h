@@ -14,10 +14,11 @@
 #include "Board.h"
 
 // [Stage 3] 아이템 개별 상태 관리를 위한 데이터 구조체
+// ItemManager.h 내부 구조체 변경점
 struct Item {
     int y, x;
-    bool isGrowth; // true: Growth Item (G), false: Poison Item (P)
-    int lifetime;  // 20틱 제한 수명 카운터
+    int type; // 0: Growth(G), 1: Poison(P), 2: Coin(C), 3: Slow(S)
+    int lifetime;
 };
 
 class ItemManager {
@@ -39,7 +40,7 @@ public:
     void spawnItem(const Board& board, const std::deque<Pos>& snakeBody);
     
     // 뱀 헤드 좌표 기준 아이템 획득 및 상호작용 충돌 판정
-    bool checkCollision(int headY, int headX, bool& isGrowth);
+    bool checkCollision(int headY, int headX, int& itemType);
     
     // ncurses 가상 터미널 버퍼 레이어 상단에 아이템 기호 오버레이 출력
     void renderItems() const;

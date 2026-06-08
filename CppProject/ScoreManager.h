@@ -28,6 +28,7 @@ struct StageRecord {
     int gateUse;     // 총 게이트 이용 횟수
     int playTime;    // 해당 스테이지 플레이 시간 (초)
     int maxCombo;    // 최대 연속 Growth 획득 콤보 수
+
 };
 
 class ScoreManager {

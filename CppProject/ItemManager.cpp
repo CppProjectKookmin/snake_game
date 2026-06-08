@@ -3,7 +3,7 @@
  * Description: ItemManager 클래스의 구현부.
  * 의사 난수(Pseudo-random) 기반의 좌표 산출 및 예외 처리 조건 검증,
  * 실시간 수명 감쇠 플래그 처리 및 독립적 렌더링 파이프라인 수행.
- * Author: 박하은
+ * Author: 박하은 (아이템 다양화 및 피버 타임 확장: 김현수)
  */
 
 #include "ItemManager.h"
@@ -25,7 +25,8 @@ void ItemManager::updateTicks() {
         it->lifetime--;
         if (it->lifetime <= 0) {
             it = items.erase(it); // 20틱 수명 만료 시 컨테이너에서 즉시 제거
-        } else {
+        }
+        else {
             ++it;
         }
     }
@@ -85,7 +86,14 @@ void ItemManager::spawnItem(const Board& board, const std::deque<Pos>& snakeBody
         Item newItem;
         newItem.y = ry;
         newItem.x = rx;
-        newItem.isGrowth = (rand() % 2 == 0); // 균등 확률 분포 기반의 아이템 속성(G/P) 결정
+
+        // [수정] 아이템 다양화 명세 준수: 확률 분포를 4종류로 확장 (0:G, 1:P, 2:C, 3:S) (김현수 추가)
+        int randVal = rand() % 100;
+        if (randVal < 40)       newItem.type = 0; // 40% 확률로 Growth
+        else if (randVal < 70)  newItem.type = 1; // 30% 확률로 Poison
+        else if (randVal < 85)  newItem.type = 2; // 15% 확률로 Coin
+        else                    newItem.type = 3; // 15% 확률로 Slow
+
         newItem.lifetime = ITEM_LIFETIME;
 
         items.push_back(newItem); // 백 엔드 벡터 컨테이너에 바인딩
@@ -93,11 +101,12 @@ void ItemManager::spawnItem(const Board& board, const std::deque<Pos>& snakeBody
     }
 }
 
-bool ItemManager::checkCollision(int headY, int headX, bool& isGrowth) {
+// [수정] 상위 도메인(main) 전파를 위해 bool 대신 int 타입으로 충돌 개체 속성 반환 (김현수 수정)
+bool ItemManager::checkCollision(int headY, int headX, int& itemType) {
     // 선형 탐색을 통한 차기 프레임 헤드 좌표와 아이템 좌표 간의 기하학적 충돌 검사
     for (auto it = items.begin(); it != items.end(); ++it) {
         if (it->y == headY && it->x == headX) {
-            isGrowth = it->isGrowth; // 상위 도메인(main) 전파를 위한 아이템 속성 플래그 갱신
+            itemType = it->type;     // 상위 도메인(main) 전파를 위한 아이템 속성 플래그 갱신
             items.erase(it);         // 물리적 상호작용 완료에 따른 즉시 삭제 처리
             return true;             // 충돌 판정 승인 반환
         }
@@ -108,10 +117,10 @@ bool ItemManager::checkCollision(int headY, int headX, bool& isGrowth) {
 void ItemManager::renderItems() const {
     // ncurses 그래픽 드라이버의 실시간 가상 윈도우 스크린 버퍼 플러시 및 텍스트 렌더링
     for (const auto& item : items) {
-        if (item.isGrowth) {
-            mvprintw(item.y, item.x, "G"); // Growth Item 개체 최종 오버레이 출력
-        } else {
-            mvprintw(item.y, item.x, "P"); // Poison Item 개체 최종 오버레이 출력
-        }
+        // [수정] 확장된 아이템 타입별 심볼 매칭 출력 (G / P / C / S) (김현수 수정)
+        if (item.type == 0)      mvprintw(item.y, item.x, "G"); // Growth Item 개체 최종 오버레이 출력
+        else if (item.type == 1) mvprintw(item.y, item.x, "P"); // Poison Item 개체 최종 오버레이 출력
+        else if (item.type == 2) mvprintw(item.y, item.x, "C"); // Coin 보너스 아이템 오버레이 출력
+        else if (item.type == 3) mvprintw(item.y, item.x, "S"); // Slow 버프 아이템 오버레이 출력
     }
 }
