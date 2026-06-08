@@ -10,7 +10,7 @@ extern "C" {
 #include "curses.h"
 }
 
-Snake::Snake() {
+Snake::Snake(const int stage) {
     // [수정] 모든 스테이지에서 장애물과 충돌하지 않는 안전 구역(Row 1)으로 스폰 위치 및 방향 변경
     current_dir = RIGHT; 
     current_length = 3;
