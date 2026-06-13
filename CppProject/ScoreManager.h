@@ -65,6 +65,9 @@ public:
     void renderFinalSummary() const;
     void renderStageClearScreen() const;
     int getCurrentStage() const;
+
+    // [추가] 외부에서 현재 콤보수를 조회할 수 있도록 Getter 인터페이스 개방
+    int getCurrentCombo() const;
 };
 
 #endif

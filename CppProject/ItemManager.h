@@ -44,6 +44,9 @@ public:
     
     // ncurses 가상 터미널 버퍼 레이어 상단에 아이템 기호 오버레이 출력
     void renderItems() const;
+
+    // [추가] 외부에서 현재 콤보수를 조회할 수 있도록 Getter 인터페이스 개방
+    int getCurrentCombo() const;
 };
 
 #endif
